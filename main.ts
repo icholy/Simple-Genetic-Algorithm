@@ -267,148 +267,148 @@ module genetics {
 		return population;
 	}
 
-}
+	let funcs = new FuncRegistry();
 
-let funcs = new genetics.FuncRegistry();
+	funcs.register(
+		new Func("ADD", (a: number, b: number): number => {
+			return a + b;
+		}));
 
-funcs.register(
-	new genetics.Func("ADD", (a: number, b: number): number => {
-		return a + b;
-	}));
+	funcs.register(
+		new Func("SUBTRACT", (a: number, b: number): number => {
+			return a - b;
+		}));
 
-funcs.register(
-	new genetics.Func("SUBTRACT", (a: number, b: number): number => {
-		return a - b;
-	}));
+	funcs.register(
+		new Func("DIVIDE", (a: number, b: number): number => {
+			return a / b;
+		}));
 
-funcs.register(
-	new genetics.Func("DIVIDE", (a: number, b: number): number => {
-		return a / b;
-	}));
+	funcs.register(
+		new Func("MULTIPLY", (a: number, b: number): number => {
+			return a * b;
+		}));
 
-funcs.register(
-	new genetics.Func("MULTIPLY", (a: number, b: number): number => {
-		return a * b;
-	}));
+	// funcs.register(
+	// 	new Func("SQRT", (a: number) => Math.sqrt(a)));
 
-// funcs.register(
-// 	new genetics.Func("SQRT", (a: number) => Math.sqrt(a)));
+	// funcs.register(
+	// 	new Func("SIN", (a: number) => Math.sin(a)));
 
-// funcs.register(
-// 	new genetics.Func("SIN", (a: number) => Math.sin(a)));
+	// funcs.register(
+	// 	new Func("COS", (a: number) => Math.cos(a)));
 
-// funcs.register(
-// 	new genetics.Func("COS", (a: number) => Math.cos(a)));
+	// funcs.register(
+	// 	new Func("LOG", (a: number) => Math.log(a)));
 
-// funcs.register(
-// 	new genetics.Func("LOG", (a: number) => Math.log(a)));
+	// funcs.register(
+	// 	new Func("POW", (a: number, b: number) => Math.pow(a, b)));
 
-// funcs.register(
-// 	new genetics.Func("POW", (a: number, b: number) => Math.pow(a, b)));
+	// funcs.register(
+	// 	new Func("ABS", (a: number) => Math.abs(a)));
 
-// funcs.register(
-// 	new genetics.Func("ABS", (a: number) => Math.abs(a)));
+	// funcs.register(
+	// 	new Func("FLOOR", (a: number) => Math.floor(a)));
 
-// funcs.register(
-// 	new genetics.Func("FLOOR", (a: number) => Math.floor(a)));
+	// funcs.register(
+	// 	new Func("CEIL", (a: number) => Math.ceil(a)));
 
-// funcs.register(
-// 	new genetics.Func("CEIL", (a: number) => Math.ceil(a)));
+	// funcs.register(
+	// 	new Func("MAX", (a: number, b: number) => Math.max(a, b)));
 
-// funcs.register(
-// 	new genetics.Func("MAX", (a: number, b: number) => Math.max(a, b)));
-
-// funcs.register(
-// 	new genetics.Func("MIN", (a: number, b: number) => Math.min(a, b)));
+	// funcs.register(
+	// 	new Func("MIN", (a: number, b: number) => Math.min(a, b)));
 
 
-let terms = new genetics.TermRegistry();
+	let terms = new TermRegistry();
 
-terms.register(new genetics.ConstantTerm(4));
-terms.register(new genetics.ConstantTerm(134));
-terms.register(new genetics.ConstantTerm(42));
-terms.register(new genetics.ConstantTerm(Math.PI));
-terms.register(new genetics.ConstantTerm(10000));
+	terms.register(new ConstantTerm(4));
+	terms.register(new ConstantTerm(134));
+	terms.register(new ConstantTerm(42));
+	terms.register(new ConstantTerm(Math.PI));
+	terms.register(new ConstantTerm(10000));
 
-terms.register(new genetics.InputTerm("X"));
+	terms.register(new InputTerm("X"));
 
-let context = new genetics.Context();
+	let context = new Context();
 
-let closest = Infinity;
+	let closest = Infinity;
 
-let count = 0;
+	let count = 0;
 
-const POPULATION_SIZE = 10000;
+	const POPULATION_SIZE = 10000;
 
 
-let population = genetics.rampedUpHalfAndHalf(funcs, terms, 2, 6, POPULATION_SIZE);
+	let population = rampedUpHalfAndHalf(funcs, terms, 2, 6, POPULATION_SIZE);
 
-let done = false;
+	let done = false;
 
-function targetFunction(x: number): number {
-	return (x * x) + x + 1;
-}
-
-function calculateError(expr: genetics.Node): number {
-	let error = 0;
-	for (let i = 0; i < 100; i++) {
-		let input = i - 50;
-		let expected = targetFunction(input);
-
-		context.set("X", input);
-		let actual = genetics.evaluateExpression(expr, context);
-
-		error += Math.abs(expected - actual);
+	function targetFunction(x: number): number {
+		return (x * x) + x + 1;
 	}
-	return error;
-}
 
-while (!done) {
+	function calculateError(expr: Node): number {
+		let error = 0;
+		for (let i = 0; i < 100; i++) {
+			let input = i - 50;
+			let expected = targetFunction(input);
 
-	// try all the expressions
-	let errors = population.map((expr) => {
-		let result = genetics.evaluateExpression(expr, context);
-		let error = calculateError(expr);
-		if (error < closest) {
-			closest = error;
-			console.log("closest:", closest);
-			if (error === 0) {
-				console.log(genetics.serializeExpression(expr));
-				done = true;
+			context.set("X", input);
+			let actual = evaluateExpression(expr, context);
+
+			error += Math.abs(expected - actual);
+		}
+		return error;
+	}
+
+	while (!done) {
+
+		// try all the expressions
+		let errors = population.map((expr) => {
+			let result = evaluateExpression(expr, context);
+			let error = calculateError(expr);
+			if (error < closest) {
+				closest = error;
+				console.log("closest:", closest);
+				if (error === 0) {
+					console.log(serializeExpression(expr));
+					done = true;
+				}
 			}
+			return {
+				error: error,
+				node: expr
+			};
+		});
+
+		// sort them based on error
+		errors.sort((a, b) => {
+			if (a.error < b.error) {
+				return -1;
+			}
+			else if (a.error > b.error) {
+				return 1;
+			}
+			return 0;
+		});
+
+		// choose the top 100 for breeding
+		let parents = errors.slice(0, 100).map(parent => parent.node);
+
+		population = [];
+
+		// add all parents to the next population
+		parents.forEach((parent) => population.push(parent));
+
+		while (population.length < POPULATION_SIZE) {
+			let i = Math.floor(Math.random() * parents.length);
+			let parent = parents[i];
+			let offspring = mutateExpression(parent, funcs, terms, 20, GenerateMethod.GROW);
+			population.push(offspring);
 		}
-		return {
-			error: error,
-			node: expr
-		};
-	});
 
-	// sort them based on error
-	errors.sort((a, b) => {
-		if (a.error < b.error) {
-			return -1;
-		}
-		else if (a.error > b.error) {
-			return 1;
-		}
-		return 0;
-	});
-
-	// choose the top 100 for breeding
-	let parents = errors.slice(0, 100).map(parent => parent.node);
-
-	population = [];
-
-	// add all parents to the next population
-	parents.forEach((parent) => population.push(parent));
-
-	while(population.length < POPULATION_SIZE) {
-		let i = Math.floor(Math.random() * parents.length);
-		let parent = parents[i];
-		let offspring = genetics.mutateExpression(parent, funcs, terms, 20, genetics.GenerateMethod.GROW);
-		population.push(offspring);
 	}
 
-
 }
+
 
