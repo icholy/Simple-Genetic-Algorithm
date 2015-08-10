@@ -247,6 +247,26 @@ module genetics {
 		return copy;
 	}
 
+	export function rampedUpHalfAndHalf(funcs: FuncRegistry, terms: TermRegistry, minDepth: number, maxDepth: number, limit: number): Node[] {
+		let population: Node[] = [];
+		let depth = minDepth;
+		let isEven = (x: number) => x % 2 === 0;
+
+		for (let i = 0; i < limit; i++) {
+
+			let method = isEven(i) ? GenerateMethod.FULL : GenerateMethod.GROW;
+			let expr = generateExpression(funcs, terms, depth, method);
+			population.push(expr);
+
+			depth++;
+			if (depth > maxDepth) {
+				depth = minDepth;
+			}
+		}
+
+		return population;
+	}
+
 }
 
 let funcs = new genetics.FuncRegistry();
