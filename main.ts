@@ -331,39 +331,50 @@ terms.register(new genetics.ConstantTerm(Math.PI));
 terms.register(new genetics.ConstantTerm(10000));
 
 terms.register(new genetics.InputTerm("X"));
-terms.register(new genetics.InputTerm("Y"));
 
 let context = new genetics.Context();
 
-context.set("X", 100);
-context.set("Y", 200);
-
-let target = 3934.45634;
 let closest = Infinity;
 
 let count = 0;
 
-let population: genetics.Node[] = [];
-
 const POPULATION_SIZE = 10000;
 
-for (let i = 0; i < POPULATION_SIZE; i++) {
-	let expr = genetics.generateExpression(funcs, terms, 20, genetics.GenerateMethod.GROW);
-	population.push(expr);
+
+let population = genetics.rampedUpHalfAndHalf(funcs, terms, 2, 6, POPULATION_SIZE);
+
+let done = false;
+
+function targetFunction(x: number): number {
+	return (x * x) + x + 1;
 }
 
-while (true) {
+function calculateError(expr: genetics.Node): number {
+	let error = 0;
+	for (let i = 0; i < 100; i++) {
+		let input = i - 50;
+		let expected = targetFunction(input);
+
+		context.set("X", input);
+		let actual = genetics.evaluateExpression(expr, context);
+
+		error += Math.abs(expected - actual);
+	}
+	return error;
+}
+
+while (!done) {
 
 	// try all the expressions
 	let errors = population.map((expr) => {
 		let result = genetics.evaluateExpression(expr, context);
-		let error = Math.abs(result - target);
+		let error = calculateError(expr);
 		if (error < closest) {
 			closest = error;
 			console.log("closest:", closest);
 			if (error === 0) {
 				console.log(genetics.serializeExpression(expr));
-				throw new Error("found it!");
+				done = true;
 			}
 		}
 		return {
