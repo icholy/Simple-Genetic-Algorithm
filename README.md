@@ -9,7 +9,7 @@ I wanted to make sure I understood the basic concepts before moving on to the mo
 * Population size is 10000
 * The individual error is total sum of the errors of all the tested samples.
 * Parents are the 100 individuals with the lowest errors.
-* The new population is created using subtree mutation on the parents.
+* The new population is created using subtree mutation and subtree crossover on the parents.
 * Function set: ADD, SUBTRACT, MULTIPLY, DIVIDE
 * Terminal set: 5 constant terms, 1 input term (X).
 
